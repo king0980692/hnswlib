@@ -22,11 +22,34 @@ jobs:
           cd my_exp
           g++ index.cpp -O3 -DNDEBUG -o index_release
 
-      - name: Upload release binaries as artifact
-        uses: actions/upload-artifact@v4  # 這裡更新為 v4
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: my_exp-release-binaries
-          path: |
-            my_exp/search_release
-            my_exp/index_release
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload search_release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: my_exp/search_release
+          asset_name: search_release
+          asset_content_type: application/octet-stream
+
+      - name: Upload index_release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: my_exp/index_release
+          asset_name: index_release
+          asset_content_type: application/octet-stream
 

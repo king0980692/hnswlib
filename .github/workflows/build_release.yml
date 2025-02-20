@@ -1,0 +1,32 @@
+name: Build Release Binaries for my_exp
+
+on:
+  push:
+    tags:
+      - 'v*'  # 當 push 版本 tag 時觸發
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build search.cpp in release mode
+        run: |
+          cd my_exp
+          g++ search.cpp -O3 -DNDEBUG -o search_release
+
+      - name: Build index.cpp in release mode
+        run: |
+          cd my_exp
+          g++ index.cpp -O3 -DNDEBUG -o index_release
+
+      - name: Upload release binaries as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: my_exp-release-binaries
+          path: |
+            my_exp/search_release
+            my_exp/index_release
+

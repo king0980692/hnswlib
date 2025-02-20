@@ -7,7 +7,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-13]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -15,12 +18,12 @@ jobs:
       - name: Build search.cpp in release mode
         run: |
           cd my_exp
-          g++ search.cpp -O3 -DNDEBUG -o search_release
+          g++ search.cpp -O3 -DNDEBUG -o hnsw_search_index
 
       - name: Build index.cpp in release mode
         run: |
           cd my_exp
-          g++ index.cpp -O3 -DNDEBUG -o index_release
+          g++ index.cpp -O3 -DNDEBUG -o hnsw_build_index
 
       - name: Create Release
         id: create_release
@@ -33,23 +36,23 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload search_release asset
+      - name: Upload hnsw_search_index asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: my_exp/search_release
-          asset_name: search_release
+          asset_path: my_exp/hnsw_search_index
+          asset_name: hnsw_search_index_${{ matrix.os }}
           asset_content_type: application/octet-stream
 
-      - name: Upload index_release asset
+      - name: Upload hnsw_build_index asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: my_exp/index_release
-          asset_name: index_release
+          asset_path: my_exp/hnsw_build_index
+          asset_name: hnsw_build_index_${{ matrix.os }}
           asset_content_type: application/octet-stream
 

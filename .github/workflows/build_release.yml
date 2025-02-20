@@ -23,7 +23,7 @@ jobs:
           g++ index.cpp -O3 -DNDEBUG -o index_release
 
       - name: Upload release binaries as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # 這裡更新為 v4
         with:
           name: my_exp-release-binaries
           path: |
